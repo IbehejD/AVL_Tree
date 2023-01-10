@@ -125,6 +125,65 @@ class AVLTree(object):
         return max(self.get_height(root.left),
                    self.get_height(root.right)) + 1
 
+    def minvalueNode(self, root):
+        '''Method searching for minimal value Node'''
+        if root is None or root.left is None:
+            return root
+        return self.getMinValueNode(root.left)
+
+    # deleting wents wrong
+    def delete(self, root, value):
+        '''Method deleting Node from tree where root is starting point 
+        of iterations and value is searching value'''
+        if root is None:
+            return root
+
+        # BST logic
+        if value < root.value:
+            root.left = self.delete(root.left, value)
+        elif value > root.value:
+            root.tight = self.delete(root.right, value)
+        else:
+            if (root.left is None) or (root.right is None):
+                temp = None
+                if root.left is None:
+                    temp = root.right
+                else:
+                    temp = root.left
+                if temp is None:
+                    temp = root
+                    root = None
+                else:
+                    root = temp
+            else:
+                temp = self.minvalueNode(root.right)
+                root.value = temp.value
+                root.right = self.delete(root.right, temp.value)
+
+        if root is None:
+            return root
+
+        # Update Height
+        root.height = self.height_update(root)
+        # Re-balance if needed
+        balance_factor = self.get_balance_factor(root)
+
+        # Balance the tree
+        if balance_factor > 1:
+            if self.get_balance_factor(root.left) >= 0:
+                return self.right_rotation(root)
+            else:
+                root.left = self.left_rotation(root.left)
+                return self.right_rotation(root)
+        if balance_factor < -1:
+            if self.get_balance_factor(root.right) <= 0:
+                return self.left_rotation(root)
+            else:
+                root.right = self.right_rotation(root.right)
+                return self.left_rotation(root)
+
+        return root
+
     def convert_to_nxGraph(self, root, graph):
         '''Assisting method for print method to convert tree to networkx Graph'''
         if root.left is not None:
@@ -152,4 +211,5 @@ if __name__ == "__main__":
     nums = [33, 13, 52, 9, 21, 61, 8, 11]
     for num in nums:
         myTree.root = myTree.insert(myTree.root, num)
+    myTree.root = myTree.delete(myTree.root, 13)
     myTree.print(myTree.root)
