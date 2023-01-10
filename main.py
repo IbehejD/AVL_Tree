@@ -125,6 +125,27 @@ class AVLTree(object):
         return max(self.get_height(root.left),
                    self.get_height(root.right)) + 1
 
+    def convert_to_nxGraph(self, root, graph):
+        '''Assisting method for print method to convert tree to networkx Graph'''
+        if root.left is not None:
+            graph.add_edge(root.value, root.left.value)
+            self.convert_to_nxGraph(root.left, graph)
+
+        if root.right is not None:
+            graph.add_edge(root.value, root.right.value)
+            self.convert_to_nxGraph(root.right, graph)
+
+    # Print the tree
+    def print(self, root):
+        '''Method printing tree'''
+        graph = nx.Graph()
+        self.convert_to_nxGraph(root, graph)
+
+        pos = graphviz_layout(graph, prog='dot')
+        nx.draw(graph, pos, with_labels=True)
+
+        plt.show()
+
 
 if __name__ == "__main__":
     myTree = AVLTree()
